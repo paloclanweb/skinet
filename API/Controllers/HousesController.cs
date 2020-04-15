@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Core.Entitities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Core.Interfaces;
 
 namespace API.Controllers
 {
@@ -11,17 +12,16 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class HousesController : ControllerBase
     {
-        private readonly StoreContext _context;
+        private readonly IHouseRepository _repo;
 
-        public HousesController(StoreContext context)
+        public HousesController(IHouseRepository repo)
         {
-            _context = context;
-
+            _repo = repo;
         }
         [HttpGet]
         public async Task<ActionResult<List<House>>> GetHouses()
         {
-            var houses = await _context.Houses.ToListAsync();
+            var houses = await _repo.GetHouseAsync();
 
             return Ok(houses);
 
@@ -30,7 +30,7 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<House>> GetHouse(int id)
         {
-           return await _context.Houses.FindAsync(id);
+            return await _repo.GetHouseByIdAsync(id);
         }
     }
 }

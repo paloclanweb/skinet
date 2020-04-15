@@ -1,5 +1,6 @@
 
 
+using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,12 +19,37 @@ namespace API
             _config = config;
 
         }
+        public void ConfigureDevelopmentServices(IServiceCollection services)
+        {
+            // Conexion por Pomelo
+            services.AddDbContextPool<StoreContext>(
+            options =>
+            {
+                // options.UseLazyLoadingProxies();
+                options.UseMySql(_config.GetConnectionString("MySQLConnection"));
+            });
 
+
+            ConfigureServices(services);
+        }
+
+        public void ConfigureProductionServices(IServiceCollection services)
+        {
+            services.AddDbContextPool<StoreContext>(
+            options =>
+            {
+                // options.UseLazyLoadingProxies();
+                options.UseMySql(_config.GetConnectionString("MySQLConnection"));
+            });
+
+            ConfigureServices(services);
+        }
 
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IHouseRepository, HouseRepository>();
             services.AddControllers();
             services.AddDbContext<StoreContext>(x => x.UseSqlite(_config.GetConnectionString("DefaultConnection")));
         }
